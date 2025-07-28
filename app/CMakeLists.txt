@@ -72,18 +72,16 @@ set(QT_LIBS
 )
 
 # Add required modules for Pro version if needed
-if(BUILD_COMMERCIAL)
-  set(QT_MODULES
-    ${QT_MODULES}
-    Mqtt
-    SerialBus
-  )
-  set(QT_LIBS
-    ${QT_LIBS}
-    Qt6::Mqtt
-    Qt6::SerialBus
-  )
-endif()
+set(QT_MODULES
+  ${QT_MODULES}
+  Mqtt
+  SerialBus
+)
+set(QT_LIBS
+  ${QT_LIBS}
+  Qt6::Mqtt
+  Qt6::SerialBus
+)
 
 # Find the Qt package and its modules
 find_package(
@@ -212,34 +210,24 @@ set(HEADERS
 )
 
 # Add headers & sources for commercial build
-if(BUILD_COMMERCIAL)
-  set(HEADERS
-    ${HEADERS}
-    src/MQTT/Client.h
-    src/IO/Drivers/Audio.h
-    src/IO/Drivers/CANBus.h
-    src/IO/Drivers/Modbus.h
-    src/UI/Widgets/Plot3D.h
-    src/Licensing/Trial.h
-    src/Licensing/MachineID.h
-    src/Licensing/SimpleCrypt.h
-    src/Licensing/LemonSqueezy.h
-    src/ThirdParty/miniaudio.h
-  )
-  set(SOURCES
-    ${SOURCES}
-    src/MQTT/Client.cpp
-    src/IO/Drivers/Audio.cpp
-    src/IO/Drivers/CANBus.cpp
-    src/IO/Drivers/Modbus.cpp
-    src/UI/Widgets/Plot3D.cpp
-    src/Licensing/Trial.cpp
-    src/ThirdParty/miniaudio.cpp
-    src/Licensing/MachineID.cpp
-    src/Licensing/SimpleCrypt.cpp
-    src/Licensing/LemonSqueezy.cpp
-  )
-endif()
+set(HEADERS
+  ${HEADERS}
+  src/MQTT/Client.h
+  src/IO/Drivers/Audio.h
+  src/IO/Drivers/CANBus.h
+  src/IO/Drivers/Modbus.h
+  src/UI/Widgets/Plot3D.h
+  src/ThirdParty/miniaudio.h
+)
+set(SOURCES
+  ${SOURCES}
+  src/MQTT/Client.cpp
+  src/IO/Drivers/Audio.cpp
+  src/IO/Drivers/CANBus.cpp
+  src/IO/Drivers/Modbus.cpp
+  src/UI/Widgets/Plot3D.cpp
+  src/ThirdParty/miniaudio.cpp
+)
 
 #-------------------------------------------------------------------------------
 # Import QML source code
@@ -306,18 +294,15 @@ set(QML_SRC
 )
 
 # Add extra QML files for commercial build
-if(BUILD_COMMERCIAL)
-  set(QML_SRC
-    ${QML_SRC}
-    qml/Widgets/Dashboard/Plot3D.qml
-    qml/Dialogs/Welcome.qml
-    qml/Dialogs/MQTTConfiguration.qml
-    qml/Dialogs/LicenseManagement.qml
-    qml/MainWindow/Panes/SetupPanes/Drivers/Audio.qml
-    qml/MainWindow/Panes/SetupPanes/Drivers/CANBus.qml
-    qml/MainWindow/Panes/SetupPanes/Drivers/Modbus.qml
-  )
-endif()
+set(QML_SRC
+  ${QML_SRC}
+  qml/Widgets/Dashboard/Plot3D.qml
+  qml/Dialogs/Welcome.qml
+  qml/Dialogs/MQTTConfiguration.qml
+  qml/MainWindow/Panes/SetupPanes/Drivers/Audio.qml
+  qml/MainWindow/Panes/SetupPanes/Drivers/CANBus.qml
+  qml/MainWindow/Panes/SetupPanes/Drivers/Modbus.qml
+)
 
 #-------------------------------------------------------------------------------
 # Platform-specific configuration
@@ -396,32 +381,30 @@ qt_add_qml_module(
 # MiniAudio configuration
 #-------------------------------------------------------------------------------
 
-if (BUILD_COMMERCIAL)
-  target_compile_definitions(${PROJECT_EXECUTABLE} PRIVATE
-    MA_NO_DECODING
-    MA_NO_ENCODING
-    MA_NO_WAV
-    MA_NO_FLAC
-    MA_NO_MP3
-    MA_NO_RESOURCE_MANAGER
-    MA_NO_NODE_GRAPH
-    MA_NO_ENGINE
-    MA_NO_GENERATION
-    MA_NO_CUSTOM
-    MA_NO_NULL
-  )
+target_compile_definitions(${PROJECT_EXECUTABLE} PRIVATE
+  MA_NO_DECODING
+  MA_NO_ENCODING
+  MA_NO_WAV
+  MA_NO_FLAC
+  MA_NO_MP3
+  MA_NO_RESOURCE_MANAGER
+  MA_NO_NODE_GRAPH
+  MA_NO_ENGINE
+  MA_NO_GENERATION
+  MA_NO_CUSTOM
+  MA_NO_NULL
+)
 
-  if(LINUX)
-    target_link_libraries(${PROJECT_EXECUTABLE} PRIVATE asound)
-  endif()
+if(LINUX)
+  target_link_libraries(${PROJECT_EXECUTABLE} PRIVATE asound)
+endif()
 
-  if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64)$")
-    target_compile_definitions(${PROJECT_EXECUTABLE} PRIVATE MA_SUPPORT_SSE2)
-  endif()
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|amd64)$")
+  target_compile_definitions(${PROJECT_EXECUTABLE} PRIVATE MA_SUPPORT_SSE2)
+endif()
 
-  if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$" AND NOT APPLE)
-    target_compile_definitions(${PROJECT_EXECUTABLE} PRIVATE MA_SUPPORT_NEON)
-  endif()
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm64|aarch64)$" AND NOT APPLE)
+  target_compile_definitions(${PROJECT_EXECUTABLE} PRIVATE MA_SUPPORT_NEON)
 endif()
 
 #-------------------------------------------------------------------------------

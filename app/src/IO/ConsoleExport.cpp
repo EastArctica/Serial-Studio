@@ -29,11 +29,12 @@
 
 #include "Misc/Utilities.h"
 
+#include "IO/Console.h"
+#include "IO/Manager.h"
+#include "Misc/TimerEvents.h"
+#include "Misc/WorkspaceManager.h"
+
 #ifdef BUILD_COMMERCIAL
-#  include "IO/Console.h"
-#  include "IO/Manager.h"
-#  include "Misc/TimerEvents.h"
-#  include "Misc/WorkspaceManager.h"
 #  include "Licensing/LemonSqueezy.h"
 #endif
 
@@ -77,11 +78,7 @@ IO::ConsoleExport &IO::ConsoleExport::instance()
  */
 bool IO::ConsoleExport::isOpen() const
 {
-#ifdef BUILD_COMMERCIAL
   return m_file.isOpen();
-#else
-  return false;
-#endif
 }
 
 /**
@@ -89,11 +86,7 @@ bool IO::ConsoleExport::isOpen() const
  */
 bool IO::ConsoleExport::exportEnabled() const
 {
-#ifdef BUILD_COMMERCIAL
   return m_exportEnabled;
-#else
-  return false;
-#endif
 }
 
 /**
@@ -101,7 +94,6 @@ bool IO::ConsoleExport::exportEnabled() const
  */
 void IO::ConsoleExport::closeFile()
 {
-#ifdef BUILD_COMMERCIAL
   if (isOpen())
   {
     if (m_buffer.size() > 0)
@@ -112,7 +104,6 @@ void IO::ConsoleExport::closeFile()
 
     Q_EMIT openChanged();
   }
-#endif
 }
 
 /**
@@ -121,14 +112,12 @@ void IO::ConsoleExport::closeFile()
  */
 void IO::ConsoleExport::setupExternalConnections()
 {
-#ifdef BUILD_COMMERCIAL
   connect(&IO::Console::instance(), &IO::Console::displayString, this,
           &IO::ConsoleExport::registerData);
   connect(&IO::Manager::instance(), &IO::Manager::connectedChanged, this,
           &IO::ConsoleExport::closeFile);
   connect(&Misc::TimerEvents::instance(), &Misc::TimerEvents::timeout1Hz, this,
           &IO::ConsoleExport::writeData);
-#endif
 }
 
 /**
@@ -136,7 +125,6 @@ void IO::ConsoleExport::setupExternalConnections()
  */
 void IO::ConsoleExport::setExportEnabled(const bool enabled)
 {
-#ifdef BUILD_COMMERCIAL
   if (SerialStudio::activated())
   {
     m_exportEnabled = enabled;
@@ -151,7 +139,6 @@ void IO::ConsoleExport::setExportEnabled(const bool enabled)
     m_settings.setValue("ConsoleExport", m_exportEnabled);
     return;
   }
-#endif
 
   closeFile();
   m_buffer.clear();
@@ -172,7 +159,6 @@ void IO::ConsoleExport::setExportEnabled(const bool enabled)
  */
 void IO::ConsoleExport::writeData()
 {
-#ifdef BUILD_COMMERCIAL
   // Device not connected, abort
   if (!IO::Manager::instance().isConnected())
     return;
@@ -196,7 +182,6 @@ void IO::ConsoleExport::writeData()
       m_buffer.clear();
     }
   }
-#endif
 }
 
 /**
@@ -204,7 +189,6 @@ void IO::ConsoleExport::writeData()
  */
 void IO::ConsoleExport::createFile()
 {
-#ifdef BUILD_COMMERCIAL
   // Only enable this feature is program is activated
   if (SerialStudio::activated())
   {
@@ -244,7 +228,6 @@ void IO::ConsoleExport::createFile()
     // Emit signals
     Q_EMIT openChanged();
   }
-#endif
 }
 
 /**
@@ -252,10 +235,6 @@ void IO::ConsoleExport::createFile()
  */
 void IO::ConsoleExport::registerData(QStringView data)
 {
-#ifdef BUILD_COMMERCIAL
   if (!data.isEmpty() && exportEnabled())
     m_buffer.append(data);
-#else
-  (void)data;
-#endif
 }

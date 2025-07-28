@@ -31,11 +31,12 @@
 
 #include <QApplication>
 
+#include "MQTT/Client.h"
+#include "Misc/Utilities.h"
+#include "IO/Drivers/Audio.h"
+
 #ifdef BUILD_COMMERCIAL
-#  include "MQTT/Client.h"
-#  include "Misc/Utilities.h"
 #  include "Licensing/Trial.h"
-#  include "IO/Drivers/Audio.h"
 #  include "Licensing/LemonSqueezy.h"
 #endif
 
@@ -282,12 +283,10 @@ QStringList IO::Manager::availableBuses() const
   list.append(tr("UART/COM"));
   list.append(tr("Network Socket"));
   list.append(tr("Bluetooth LE"));
-#ifdef BUILD_COMMERCIAL
   list.append(tr("Audio Stream"));
   // Comment these ports for the future
   // list.append(tr("Modbus"));
   // list.append(tr("CAN Bus"));
-#endif
   return list;
 }
 
@@ -491,10 +490,8 @@ void IO::Manager::processPayload(const QByteArray &payload)
     console.hotpathRxData(payload);
     frameBuilder.hotpathRxFrame(payload);
 
-#ifdef BUILD_COMMERCIAL
     static auto &mqtt = MQTT::Client::instance();
     mqtt.hotpathTxFrame(payload);
-#endif
   }
 }
 
@@ -664,11 +661,9 @@ void IO::Manager::setBusType(const SerialStudio::BusType &driver)
     }
   }
 
-#ifdef BUILD_COMMERCIAL
   // Try to open an Audio connection
   else if (busType() == SerialStudio::BusType::Audio)
     setDriver(static_cast<HAL_Driver *>(&(Drivers::Audio::instance())));
-#endif
 
   // Invalid driver
   else
@@ -779,9 +774,7 @@ void IO::Manager::startFrameReader()
 void IO::Manager::onReadyRead()
 {
   static auto &frameBuilder = JSON::FrameBuilder::instance();
-#ifdef BUILD_COMMERCIAL
   static auto &mqtt = MQTT::Client::instance();
-#endif
 
   auto reader = m_frameReader;
   if (!m_paused && reader) [[likely]]
@@ -790,9 +783,7 @@ void IO::Manager::onReadyRead()
     while (queue.try_dequeue(m_frame))
     {
       frameBuilder.hotpathRxFrame(m_frame);
-#ifdef BUILD_COMMERCIAL
       mqtt.hotpathTxFrame(m_frame);
-#endif
     }
   }
 }

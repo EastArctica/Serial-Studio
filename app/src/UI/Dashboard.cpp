@@ -26,9 +26,7 @@
 #include "Misc/TimerEvents.h"
 #include "JSON/FrameBuilder.h"
 
-#ifdef BUILD_COMMERCIAL
-#  include "MQTT/Client.h"
-#endif
+#include "MQTT/Client.h"
 
 #include <QTimer>
 
@@ -58,7 +56,6 @@ UI::Dashboard::Dashboard()
   // clang-format on
 
   // Reset dashboard data if MQTT client is subscribed
-#ifdef BUILD_COMMERCIAL
   connect(&MQTT::Client::instance(), &MQTT::Client::connectedChanged, this,
           [=, this] {
             const bool subscribed = MQTT::Client::instance().isSubscriber();
@@ -69,7 +66,6 @@ UI::Dashboard::Dashboard()
             if (subscribed || wasSubscribed)
               resetData(true);
           });
-#endif
 
   // Update the dashboard widgets at 24 Hz
   connect(&Misc::TimerEvents::instance(), &Misc::TimerEvents::timeout24Hz, this,
@@ -204,13 +200,9 @@ bool UI::Dashboard::streamAvailable() const
   const bool csvOpen = player.isOpen();
   const bool serialConnected = manager.isConnected();
 
-#ifdef BUILD_COMMERCIAL
   static auto &mqtt = MQTT::Client::instance();
   const bool mqttConnected = mqtt.isConnected() && mqtt.isSubscriber();
   return serialConnected || csvOpen || mqttConnected;
-#else
-  return serialConnected || csvOpen;
-#endif
 }
 
 /**
@@ -230,14 +222,9 @@ bool UI::Dashboard::terminalEnabled() const
  */
 bool UI::Dashboard::pointsWidgetVisible() const
 {
-#ifdef BUILD_COMMERCIAL
   return m_widgetGroups.contains(SerialStudio::DashboardMultiPlot)
          || m_widgetDatasets.contains(SerialStudio::DashboardPlot)
          || m_widgetGroups.contains(SerialStudio::DashboardPlot3D);
-#else
-  return m_widgetGroups.contains(SerialStudio::DashboardMultiPlot)
-         || m_widgetDatasets.contains(SerialStudio::DashboardPlot);
-#endif
 }
 
 /**
@@ -581,7 +568,6 @@ const MultiLineSeries &UI::Dashboard::multiplotData(const int index) const
   return m_multipltValues[index];
 }
 
-#ifdef BUILD_COMMERCIAL
 /**
  * @brief Returns the 3D trajectory data for a 3D plot widget.
  *
@@ -592,7 +578,6 @@ const PlotData3D &UI::Dashboard::plotData3D(const int index) const
 {
   return m_plotData3D[index];
 }
-#endif
 
 //------------------------------------------------------------------------------
 // Setter functions
@@ -656,10 +641,8 @@ void UI::Dashboard::resetData(const bool notify)
   m_multipltValues.squeeze();
 
   // Clear data for 3D plots
-#ifdef BUILD_COMMERCIAL
   m_plotData3D.clear();
   m_plotData3D.squeeze();
-#endif
 
   // Clear GPS data
   m_gpsValues.clear();
@@ -1078,9 +1061,7 @@ void UI::Dashboard::updateDataSeries()
   const int fftCount = widgetCount(SerialStudio::DashboardFFT);
   const int plotCount = widgetCount(SerialStudio::DashboardPlot);
   const int multiCount = widgetCount(SerialStudio::DashboardMultiPlot);
-#ifdef BUILD_COMMERCIAL
   const int plot3DCount = widgetCount(SerialStudio::DashboardPlot3D);
-#endif
 
   // Resize data points if needed
   if (m_gpsValues.size() != gpsCount) [[unlikely]]
@@ -1091,10 +1072,8 @@ void UI::Dashboard::updateDataSeries()
     configureLineSeries();
   if (m_multipltValues.size() != multiCount) [[unlikely]]
     configureMultiLineSeries();
-#ifdef BUILD_COMMERCIAL
   if (m_plotData3D.size() != plot3DCount) [[unlikely]]
     configurePlot3DSeries();
-#endif
 
   // Update GPS data
   for (int i = 0; i < gpsCount; ++i)
@@ -1161,7 +1140,6 @@ void UI::Dashboard::updateDataSeries()
   }
 
   // Update 3D plots
-#ifdef BUILD_COMMERCIAL
   for (int i = 0; i < plot3DCount; ++i)
   {
     auto &plotData = m_plotData3D[i];
@@ -1185,7 +1163,6 @@ void UI::Dashboard::updateDataSeries()
     if (plotData.size() > maxPoints)
       plotData.erase(plotData.begin(), plotData.end() - maxPoints);
   }
-#endif
 }
 
 /**
@@ -1344,7 +1321,6 @@ void UI::Dashboard::configureLineSeries()
   }
 }
 
-#ifdef BUILD_COMMERCIAL
 /**
  * @brief Initializes internal data structures for 3D trajectory plot widgets.
  *
@@ -1369,7 +1345,6 @@ void UI::Dashboard::configurePlot3DSeries()
     m_plotData3D[i].shrink_to_fit();
   }
 }
-#endif
 
 /**
  * @brief Configures the multi-line series data structure for the dashboard.

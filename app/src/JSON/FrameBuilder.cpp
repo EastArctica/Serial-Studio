@@ -28,8 +28,9 @@
 #include "JSON/ProjectModel.h"
 #include "JSON/FrameBuilder.h"
 
+#include "IO/Drivers/Audio.h"
+
 #ifdef BUILD_COMMERCIAL
-#  include "IO/Drivers/Audio.h"
 #  include "Licensing/LemonSqueezy.h"
 #endif
 
@@ -522,7 +523,6 @@ void JSON::FrameBuilder::parseQuickPlotFrame(const QByteArray &data)
 void JSON::FrameBuilder::buildQuickPlotFrame(const QStringList &channels)
 {
   // Parse audio data
-#ifdef BUILD_COMMERCIAL
   const auto busType = IO::Manager::instance().busType();
   if (busType == SerialStudio::BusType::Audio)
   {
@@ -598,7 +598,6 @@ void JSON::FrameBuilder::buildQuickPlotFrame(const QStringList &channels)
     m_quickPlotFrame.buildUniqueIds();
     return;
   }
-#endif
 
   // Create datasets from the data
   int idx = 1;

@@ -46,7 +46,7 @@ bool SerialStudio::activated()
   return Licensing::LemonSqueezy::instance().isActivated()
          || Licensing::Trial::instance().trialEnabled();
 #else
-  return false;
+  return true;
 #endif
 }
 

@@ -123,9 +123,7 @@ public:
   [[nodiscard]] const LineSeries &plotData(const int index) const;
   [[nodiscard]] const MultiLineSeries &multiplotData(const int index) const;
 
-#ifdef BUILD_COMMERCIAL
   [[nodiscard]] const PlotData3D &plotData3D(const int index) const;
-#endif
 
 public slots:
   void setPoints(const int points);
@@ -167,9 +165,7 @@ private:
   QVector<PlotDataY> m_fftValues;            // FFT data per dataset
   QVector<LineSeries> m_pltValues;           // Line plot data
   QVector<MultiLineSeries> m_multipltValues; // Multi-line plot data
-#ifdef BUILD_COMMERCIAL
   QVector<PlotData3D> m_plotData3D; // 3D plot data (commercial only)
-#endif
 
   QMap<int, QTimer *> m_timers;        // Timers for dashboard actions
   QVector<JSON::Action> m_actions;     // User-defined dashboard actions

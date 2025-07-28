@@ -40,13 +40,11 @@ typedef IO::FixedQueue<double> PlotDataX;
  */
 typedef IO::FixedQueue<double> PlotDataY;
 
-#ifdef BUILD_COMMERCIAL
 /**
  * @typedef PlotData3D
  * @brief Represents a list of 3D points.
  */
 typedef std::vector<QVector3D> PlotData3D;
-#endif
 
 /**
  * @typedef MultiPlotDataY
@@ -234,11 +232,9 @@ public:
     UART,        /**< Serial port communication. */
     Network,     /**< Network socket communication. */
     BluetoothLE, /**< Bluetooth Low Energy communication. */
-#ifdef BUILD_COMMERCIAL
     Audio,  /**< Audio input device */
     ModBus, /**< MODBUS communication */
     CanBus, /**< CANBUS communication */
-#endif
   };
   Q_ENUM(BusType)
 

@@ -26,9 +26,7 @@
 #include "Misc/Utilities.h"
 #include "Misc/WorkspaceManager.h"
 
-#ifdef BUILD_COMMERCIAL
-#  include "MQTT/Client.h"
-#endif
+#include "MQTT/Client.h"
 
 #include <QDir>
 #include <QDateTime>
@@ -206,15 +204,10 @@ void CSV::Export::hotpathTxFrame(const JSON::Frame &frame)
     return;
 
   // Skip if not connected to a device
-#ifdef BUILD_COMMERCIAL
   if (!IO::Manager::instance().isConnected()
       && !(MQTT::Client::instance().isConnected()
            && MQTT::Client::instance().isSubscriber()))
     return;
-#else
-  if (!IO::Manager::instance().isConnected())
-    return;
-#endif
 
   // Add frame to pending frame queue
   if (!m_pendingFrames.enqueue(TimestampFrame(JSON::Frame(frame))))

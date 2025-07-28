@@ -44,6 +44,7 @@
 #include "IO/Drivers/UART.h"
 #include "IO/Drivers/Network.h"
 #include "IO/Drivers/BluetoothLE.h"
+#include "IO/Drivers/Audio.h"
 
 #include "Misc/Utilities.h"
 #include "Misc/Translator.h"
@@ -72,12 +73,12 @@
 #include "UI/Widgets/Gyroscope.h"
 #include "UI/Widgets/MultiPlot.h"
 #include "UI/Widgets/Accelerometer.h"
+#include "UI/Widgets/Plot3D.h"
+
+#include "MQTT/Client.h"
 
 #ifdef BUILD_COMMERCIAL
-#  include "MQTT/Client.h"
 #  include "Licensing/Trial.h"
-#  include "IO/Drivers/Audio.h"
-#  include "UI/Widgets/Plot3D.h"
 #  include "Licensing/LemonSqueezy.h"
 #endif
 
@@ -266,9 +267,7 @@ void Misc::ModuleManager::registerQmlTypes()
   qmlRegisterType<Widgets::Accelerometer>("SerialStudio", 1, 0,
                                           "AccelerometerModel");
 
-#ifdef BUILD_COMMERCIAL
   qmlRegisterType<Widgets::Plot3D>("SerialStudio", 1, 0, "Plot3DWidget");
-#endif
 
   // Register JSON custom items
   qmlRegisterType<JSON::FrameParser>("SerialStudio", 1, 0, "FrameParser");
@@ -325,13 +324,9 @@ void Misc::ModuleManager::initializeQmlInterface()
   auto miscWorkspaceManager = &Misc::WorkspaceManager::instance();
 
   // Initialize commercial modules
-#ifdef BUILD_COMMERCIAL
   const bool qtCommercialAvailable = true;
   auto mqttClient = &MQTT::Client::instance();
   auto audioDriver = &IO::Drivers::Audio::instance();
-#else
-  const bool qtCommercialAvailable = false;
-#endif
 
   // Initialize third-party modules
   auto updater = QSimpleUpdater::getInstance();
@@ -374,10 +369,11 @@ void Misc::ModuleManager::initializeQmlInterface()
   c->setContextProperty("Cpp_CommercialBuild", qtCommercialAvailable);
 
   // Register commercial C++ modules with QML
-#ifdef BUILD_COMMERCIAL
   c->setContextProperty("Cpp_IO_Audio", audioDriver);
-  c->setContextProperty("Cpp_Licensing_Trial", trial);
   c->setContextProperty("Cpp_MQTT_Client", mqttClient);
+
+#ifdef BUILD_COMMERCIAL
+  c->setContextProperty("Cpp_Licensing_Trial", trial);
   c->setContextProperty("Cpp_Licensing_LemonSqueezy", lemonSqueezy);
 #endif
 
