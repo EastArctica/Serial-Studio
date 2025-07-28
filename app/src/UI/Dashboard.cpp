@@ -18,7 +18,7 @@
  *
  * SPDX-License-Identifier: GPL-3.0-only OR LicenseRef-SerialStudio-Commercial
  */
-
+//
 #include "UI/Dashboard.h"
 
 #include "IO/Manager.h"
